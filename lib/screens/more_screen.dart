@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config.dart';
 import '../widgets/common.dart';
+import 'legal_page_screen.dart';
 import 'web_page_screen.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -15,6 +16,16 @@ class MoreScreen extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () => openWebPage(context, title, AppConfig.url(path)),
         );
+
+    Widget legal(IconData icon, String path) {
+      final page = AppConfig.legal(path);
+      return ListTile(
+        leading: Icon(icon, color: ArkaColors.gold),
+        title: Text(page.title),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => openLegalPage(context, page),
+      );
+    }
 
     Widget group(String title, List<Widget> children) => Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -50,13 +61,13 @@ class MoreScreen extends StatelessWidget {
             tile(Icons.local_shipping_outlined, 'Bestellung verfolgen', AppConfig.orderTrackingPath),
           ]),
           group('Service', [
-            tile(Icons.payments_outlined, 'Versand & Zahlung', AppConfig.shippingPath),
-            tile(Icons.assignment_return_outlined, 'Widerrufsbelehrung', AppConfig.withdrawalPath),
+            legal(Icons.payments_outlined, AppConfig.shippingPath),
+            legal(Icons.assignment_return_outlined, AppConfig.withdrawalPath),
           ]),
           group('Rechtliches', [
-            tile(Icons.description_outlined, 'AGB', AppConfig.termsPath),
-            tile(Icons.privacy_tip_outlined, 'Datenschutzerklärung', AppConfig.privacyPath),
-            tile(Icons.info_outline, 'Impressum', AppConfig.imprintPath),
+            legal(Icons.description_outlined, AppConfig.termsPath),
+            legal(Icons.privacy_tip_outlined, AppConfig.privacyPath),
+            legal(Icons.info_outline, AppConfig.imprintPath),
           ]),
           group('Website', [
             ListTile(

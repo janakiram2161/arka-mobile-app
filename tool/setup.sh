@@ -12,7 +12,7 @@ if [ ! -d android ] || [ ! -d ios ]; then
   flutter create --org de.arkaschmuck --project-name arka_schmuck --platforms android,ios --no-pub .
 fi
 
-flutter pub add http cached_network_image shared_preferences webview_flutter url_launcher
+flutter pub add http cached_network_image shared_preferences webview_flutter url_launcher flutter_widget_from_html_core
 flutter pub add --dev flutter_launcher_icons
 
 MANIFEST=android/app/src/main/AndroidManifest.xml

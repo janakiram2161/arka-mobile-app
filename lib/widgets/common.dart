@@ -7,9 +7,10 @@ import '../screens/product_screen.dart';
 import '../state/stores.dart';
 
 class NetImage extends StatelessWidget {
-  const NetImage(this.url, {super.key, this.fit = BoxFit.cover});
+  const NetImage(this.url, {super.key, this.fit = BoxFit.cover, this.alignment = Alignment.center});
   final String url;
   final BoxFit fit;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class NetImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url,
       fit: fit,
+      alignment: alignment,
       placeholder: (context, _) => Container(color: ArkaColors.sand),
       errorWidget: (context, _, __) => Container(
         color: ArkaColors.sand,

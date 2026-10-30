@@ -5,6 +5,7 @@ import '../config.dart';
 import '../models/models.dart';
 import '../state/stores.dart';
 import '../widgets/common.dart';
+import '../widgets/home_slider.dart';
 import 'product_list_screen.dart';
 import 'search_screen.dart';
 
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                SliverToBoxAdapter(child: _Hero(product: data.newest.isEmpty ? null : data.newest.first)),
+                const SliverToBoxAdapter(child: HomeSlider()),
                 const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.only(top: 16), child: UspRow())),
                 if (data.categories.isNotEmpty) ...[
                   const SliverToBoxAdapter(child: SectionHeader(title: 'Kategorien')),
@@ -141,74 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _Hero extends StatelessWidget {
-  const _Hero({this.product});
-  final Product? product;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: AspectRatio(
-          aspectRatio: 4 / 4.2,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              NetImage(product?.imageUrl ?? ''),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x00000000), Color(0x221C1B19), Color(0xCC1C1B19)],
-                    stops: [0.35, 0.6, 1.0],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 22,
-                right: 22,
-                bottom: 22,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'NEU BEI ARKA',
-                      style: TextStyle(color: ArkaColors.gold, letterSpacing: 3, fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Schmuck, der bleibt.',
-                      style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w600, height: 1.15),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Wasserfest · Antiallergen · Nickelfrei',
-                      style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 14),
-                    ),
-                    const SizedBox(height: 16),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: ArkaColors.ink,
-                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-                      ),
-                      onPressed: () => openProductList(context, title: 'Neu eingetroffen'),
-                      child: const Text('Jetzt entdecken'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

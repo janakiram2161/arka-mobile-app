@@ -5,6 +5,7 @@ import '../config.dart';
 import '../models/models.dart';
 import '../state/stores.dart';
 import '../widgets/common.dart';
+import 'legal_page_screen.dart';
 import 'web_page_screen.dart';
 
 void openProduct(BuildContext context, int id, {Product? product}) {
@@ -349,13 +350,13 @@ class _ProductBodyState extends State<_ProductBody> {
                             contentPadding: EdgeInsets.zero,
                             title: const Text('Versand und Zahlung'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => openWebPage(context, 'Versand & Zahlung', AppConfig.url(AppConfig.shippingPath)),
+                            onTap: () => openLegalPage(context, AppConfig.legal(AppConfig.shippingPath)),
                           ),
                           ListTile(
                             contentPadding: EdgeInsets.zero,
                             title: const Text('Widerrufsbelehrung'),
                             trailing: const Icon(Icons.chevron_right),
-                            onTap: () => openWebPage(context, 'Widerrufsbelehrung', AppConfig.url(AppConfig.withdrawalPath)),
+                            onTap: () => openLegalPage(context, AppConfig.legal(AppConfig.withdrawalPath)),
                           ),
                         ],
                       ),

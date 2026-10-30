@@ -109,6 +109,47 @@ jobs:
           git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "iOS build ${{ github.run_number }}"
           git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/ci-log-ios
 
+  preview:
+    name: Screen preview (screenshots)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install pillow playwright && python -m playwright install --with-deps chromium
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare project
+        run: |
+          bash tool/setup.sh
+          flutter create --platforms web --no-pub .
+          flutter pub get
+
+      - name: Build web preview
+        run: flutter build web --release 2>&1 | tee preview.log
+
+      - name: Take screenshots
+        run: python tool/preview_shots.py 2>&1 | tee -a preview.log
+
+      - name: Save screenshots
+        if: always()
+        run: |
+          cd "$RUNNER_TEMP" && rm -rf shots && mkdir shots && cd shots
+          git init -q
+          cp -r "$GITHUB_WORKSPACE/preview" . 2>/dev/null || true
+          cp "$GITHUB_WORKSPACE/preview.log" . 2>/dev/null || true
+          echo "${{ job.status }}" > status.txt
+          git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "Preview ${{ github.run_number }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/ci-preview
+
   release:
     name: Publish test build
     needs: [android, ios]

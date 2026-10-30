@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'config.dart';
 import 'screens/cart_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/legal_page_screen.dart';
 import 'screens/more_screen.dart';
+import 'screens/product_screen.dart';
 import 'screens/shop_screen.dart';
 import 'screens/wishlist_screen.dart';
 import 'state/stores.dart';
@@ -28,9 +31,28 @@ class ArkaApp extends StatelessWidget {
       title: 'ARKA Schmuck',
       debugShowCheckedModeBanner: false,
       theme: buildArkaTheme(),
-      home: const RootShell(),
+      home: _previewScreen() ?? const RootShell(),
     );
   }
+}
+
+/// Only for the automatic screenshot check of the web preview build
+/// (e.g. ?screen=legal-1776). Has no effect in the Android and iOS apps.
+Widget? _previewScreen() {
+  if (!kIsWeb) return null;
+  final screen = Uri.base.queryParameters['screen'] ?? '';
+  if (screen.startsWith('legal-')) {
+    final id = int.tryParse(screen.substring(6));
+    final page = AppConfig.legalPages.where((p) => p.id == id).toList();
+    if (page.isNotEmpty) return LegalPageScreen(page: page.first);
+  }
+  if (screen.startsWith('product-')) {
+    final id = int.tryParse(screen.substring(8));
+    if (id != null) return ProductScreen(productId: id);
+  }
+  const tabs = {'home': 0, 'shop': 1, 'wishlist': 2, 'cart': 3, 'more': 4};
+  if (tabs.containsKey(screen)) rootTab.value = tabs[screen]!;
+  return null;
 }
 
 class RootShell extends StatelessWidget {

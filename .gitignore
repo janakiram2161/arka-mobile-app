@@ -22,3 +22,5 @@ pubspec.lock
 Payload/
 *.apk
 *.ipa
+web/
+preview/

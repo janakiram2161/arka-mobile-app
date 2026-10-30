@@ -7,11 +7,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../config.dart';
 import '../state/stores.dart';
 import '../utils/html.dart';
+import 'legal_page_screen.dart';
 import 'web_page_screen.dart';
 
-/// Hands the app cart over to the real shop and opens the shop's own checkout,
-/// so every payment method of the website (PayPal, WooPayments …) and the
-/// legal checkout texts stay exactly as on arkaschmuck.de.
+/// In-app checkout. The app cart is handed to the shop through the Store API
+/// (no website page is shown for that) and then only the shop's payment page
+/// is displayed – without the website's header, menu, footer or cart page.
+/// Payment methods (card, Klarna, PayPal, bank transfer), coupons and the
+/// legal checkout texts are exactly those of arkaschmuck.de.
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
 
@@ -22,6 +25,8 @@ class CheckoutScreen extends StatefulWidget {
 enum _Stage { transferring, checkout, done, failed }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
+  static const String _bootstrapPath = '/wp-json/wc/store/v1/cart';
+
   late final WebViewController _controller;
   _Stage _stage = _Stage.transferring;
   bool _injected = false;
@@ -34,15 +39,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(ArkaColors.white)
+      ..setBackgroundColor(ArkaColors.cream)
       ..addJavaScriptChannel('ArkaApp', onMessageReceived: _onMessage)
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (p) {
             if (mounted) setState(() => _progress = p / 100);
           },
+          onPageStarted: (_) => _controller.runJavaScript(appWebCssScript()).catchError((_) {}),
           onPageFinished: _onPageFinished,
-          onNavigationRequest: handleWebNavigation,
+          onNavigationRequest: _onNavigation,
         ),
       );
     _start(initial: true);
@@ -57,7 +63,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _start({bool initial = false}) {
     _injected = false;
     _timeout?.cancel();
-    _timeout = Timer(const Duration(seconds: 40), () {
+    _timeout = Timer(const Duration(seconds: 45), () {
       if (mounted && _stage == _Stage.transferring) {
         _fail('Die Verbindung zum Shop dauert zu lange.');
       }
@@ -65,10 +71,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _stage = _Stage.transferring;
     _error = '';
     if (!initial) setState(() {});
-    _controller.loadRequest(Uri.parse(AppConfig.url(AppConfig.cartPath)));
+    _controller.loadRequest(Uri.parse(AppConfig.url(_bootstrapPath)));
   }
 
-  String _script() {
+  String _transferScript() {
     final items = jsonEncode(CartStore.instance.items.map((i) => i.toStoreApiItem()).toList());
     return '''
 (async function () {
@@ -93,7 +99,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     }
     ArkaApp.postMessage('ok');
-    window.location.href = '${AppConfig.checkoutPath}';
+    window.location.replace('${AppConfig.checkoutPath}');
   } catch (e) {
     ArkaApp.postMessage('error:' + e);
   }
@@ -101,21 +107,62 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 ''';
   }
 
-  void _onPageFinished(String url) {
+  String _pathOf(String url) {
+    final p = Uri.tryParse(url)?.path ?? '';
+    return p.endsWith('/') ? p : '$p/';
+  }
+
+  Future<void> _onPageFinished(String url) async {
+    if (!mounted) return;
+    final path = _pathOf(url);
+    if (path.startsWith(_bootstrapPath)) {
+      if (_stage == _Stage.transferring && !_injected) {
+        _injected = true;
+        await _controller.runJavaScript(_transferScript()).catchError((_) {});
+      }
+      return;
+    }
+    await _controller.runJavaScript(appWebCssScript()).catchError((_) {});
     if (!mounted) return;
     if (url.contains('order-received')) {
       CartStore.instance.clear();
       setState(() => _stage = _Stage.done);
       return;
     }
-    if (_stage == _Stage.transferring && !_injected) {
-      _injected = true;
-      _controller.runJavaScript(_script());
+    if (path == AppConfig.cartPath) {
+      // The shop sends an empty checkout to its cart page – never show it.
+      _fail('Der Warenkorb ist im Shop nicht angekommen.');
       return;
     }
-    if (_stage == _Stage.transferring && url.contains(AppConfig.checkoutPath)) {
+    if (path.startsWith(AppConfig.checkoutPath) && _stage == _Stage.transferring) {
       _timeout?.cancel();
-      setState(() => _stage = _Stage.checkout);
+      // Give the page a moment to apply the app styling before it is shown.
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      if (mounted) setState(() => _stage = _Stage.checkout);
+    }
+  }
+
+  NavigationDecision _onNavigation(NavigationRequest request) {
+    if (!request.isMainFrame) return NavigationDecision.navigate;
+    switch (classifyShopLink(request.url, [AppConfig.checkoutPath, _bootstrapPath])) {
+      case ShopLinkTarget.stay:
+        return NavigationDecision.navigate;
+      case ShopLinkTarget.legal:
+        openLegalPage(context, AppConfig.legalForUrl(request.url)!);
+        return NavigationDecision.prevent;
+      case ShopLinkTarget.cart:
+        // Links to the website cart go back to the app's own cart instead.
+        Navigator.of(context).pop();
+        return NavigationDecision.prevent;
+      case ShopLinkTarget.external:
+        openExternal(request.url);
+        return NavigationDecision.prevent;
+      case ShopLinkTarget.blocked:
+        if (_stage == _Stage.done) {
+          Navigator.of(context).popUntil((r) => r.isFirst);
+          rootTab.value = 0;
+        }
+        return NavigationDecision.prevent;
     }
   }
 
@@ -138,7 +185,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _back() async {
     if (_stage == _Stage.checkout && await _controller.canGoBack()) {
       final url = await _controller.currentUrl() ?? '';
-      if (!url.contains(AppConfig.checkoutPath)) {
+      final path = _pathOf(url);
+      if (!path.startsWith(AppConfig.checkoutPath) && !path.startsWith(_bootstrapPath)) {
         await _controller.goBack();
         return;
       }
@@ -155,7 +203,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _back),
-        title: const Text('Kasse', style: TextStyle(fontSize: 17)),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.lock_outline, size: 18),
+            const SizedBox(width: 6),
+            Text(_stage == _Stage.done ? 'Bestellung' : 'Kasse', style: const TextStyle(fontSize: 17)),
+          ],
+        ),
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
@@ -174,7 +229,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 children: [
                   CircularProgressIndicator(color: ArkaColors.gold),
                   SizedBox(height: 18),
-                  Text('Dein Warenkorb wird an den Shop übergeben …', textAlign: TextAlign.center),
+                  Text('Die Kasse wird vorbereitet …', textAlign: TextAlign.center),
                 ],
               ),
             ),
@@ -185,7 +240,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 children: [
                   const Icon(Icons.error_outline, color: ArkaColors.sale, size: 40),
                   const SizedBox(height: 12),
-                  const Text('Der Warenkorb konnte nicht übertragen werden.',
+                  const Text('Die Kasse konnte nicht geöffnet werden.',
                       textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w600)),
                   if (_error.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -196,6 +251,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     style: FilledButton.styleFrom(backgroundColor: ArkaColors.ink),
                     onPressed: _start,
                     child: const Text('Erneut versuchen'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Zurück zum Warenkorb'),
                   ),
                 ],
               ),
@@ -213,7 +273,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Navigator.of(context).popUntil((r) => r.isFirst);
                     rootTab.value = 0;
                   },
-                  child: const Text('Zurück zum Shop'),
+                  child: const Text('Weiter einkaufen'),
                 ),
               ),
             ),
