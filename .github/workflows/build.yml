@@ -1,0 +1,131 @@
+name: Build ARKA Schmuck app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install pillow
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare project
+        run: bash tool/setup.sh 2>&1 | tee -a build-android.log
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee -a build-android.log
+
+      - name: Unit tests
+        run: flutter test 2>&1 | tee -a build-android.log
+
+      - name: Build APK
+        run: flutter build apk --release --build-number=${{ github.run_number }} 2>&1 | tee -a build-android.log
+
+      - name: Rename APK
+        run: cp build/app/outputs/flutter-apk/app-release.apk ARKA-Schmuck.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ARKA-Schmuck-Android
+          path: ARKA-Schmuck.apk
+
+      - name: Save build log
+        if: always()
+        run: |
+          cd "$RUNNER_TEMP" && rm -rf logrepo && mkdir logrepo && cd logrepo
+          git init -q
+          cp "$GITHUB_WORKSPACE/build-android.log" . 2>/dev/null || echo "no log" > build-android.log
+          echo "${{ job.status }}" > status.txt
+          git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "Android build ${{ github.run_number }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/ci-log-android
+
+  ios:
+    name: iOS build (unsigned)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install pillow
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare project
+        run: bash tool/setup.sh 2>&1 | tee -a build-ios.log
+
+      - name: Build iOS app (no code signing)
+        run: flutter build ios --release --no-codesign --build-number=${{ github.run_number }} 2>&1 | tee -a build-ios.log
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -qr ARKA-Schmuck-iOS-unsigned.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ARKA-Schmuck-iOS-unsigned
+          path: ARKA-Schmuck-iOS-unsigned.ipa
+
+      - name: Save build log
+        if: always()
+        run: |
+          cd "$RUNNER_TEMP" && rm -rf logrepo && mkdir logrepo && cd logrepo
+          git init -q
+          cp "$GITHUB_WORKSPACE/build-ios.log" . 2>/dev/null || echo "no log" > build-ios.log
+          echo "${{ job.status }}" > status.txt
+          git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "iOS build ${{ github.run_number }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/ci-log-ios
+
+  release:
+    name: Publish test build
+    needs: [android, ios]
+    if: always() && needs.android.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: ARKA Schmuck Test-Build ${{ github.run_number }}
+          prerelease: true
+          body: |
+            **Android:** ARKA-Schmuck.apk auf dem Handy herunterladen und öffnen (Installation aus unbekannten Quellen erlauben).
+            **iOS:** ARKA-Schmuck-iOS-unsigned.ipa ist unsigniert und lässt sich erst nach Signierung mit einem Apple-Developer-Konto auf dem iPhone installieren.
+          files: dist/*

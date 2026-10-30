@@ -1,0 +1,20 @@
+name: arka_schmuck
+description: "ARKA Schmuck – Shop-App für arkaschmuck.de"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+# Packages are added by tool/setup.sh (flutter pub add ...) so the newest
+# compatible versions are resolved by the Flutter version used for the build.
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
