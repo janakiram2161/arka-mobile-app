@@ -37,6 +37,12 @@ with sync_playwright() as pw:
     print('boot', page.evaluate(BOOT, items))
     page.goto(SITE + '/checkout/', wait_until='load', timeout=90000)
     page.wait_for_timeout(4000)
-    print(json.dumps(page.evaluate(PROBE), indent=1, ensure_ascii=False))
-    open('out/checkout.html', 'w').write(page.content())
+    print(page.evaluate('''() => { const d = (el) => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + '.' + (el.className||'').toString().trim().split(/\\s+/).slice(0,5).join('.') + ' h=' + Math.round(el.getBoundingClientRect().height);
+      const out = []; for (const c of document.querySelector('#page').children) { out.push(d(c)); }
+      out.push('--main'); for (const c of document.querySelector('#main-content').children) { out.push(d(c)); for (const cc of c.children) out.push('   ' + d(cc)); }
+      return out.join('\\n'); }'''))
+    page.add_style_tag(content=open('diag/app.css').read())
+    page.wait_for_timeout(1500)
+    page.screenshot(path='out/clean_top.png')
+    page.screenshot(path='out/clean_full.png', full_page=True)
     b.close()

@@ -1,0 +1,6 @@
+.pls-promo-bar, #header, .pls-site-header, #footer, .pls-site-footer, .pls-mobile-navbar, .pls-back-to-top,
+.pls-mobile-menu, .pls-search-popup, .pls-minicart-slide, .pls-mask-overaly, #wpconsent-root,
+.pls-page-title, .page-title-wrapper, .woocommerce-breadcrumb, .gt_float_switcher, .gtranslate_wrapper { display: none !important; }
+html, body { margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+#page { padding-top: 0 !important; margin-top: 0 !important; }
+#main-content { padding-top: 16px !important; margin-top: 0 !important; }
