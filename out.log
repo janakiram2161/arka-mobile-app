@@ -1,0 +1,9 @@
+boot 201
+header#header.pls-site-header.header-2.header-sticky h=60
+div#main-content.pls-site-content h=3911
+footer#footer.pls-site-footer h=782
+--main
+div#page-title.pls-page-title.pls-page-title-title-centered.title-size-default.color-scheme-inherit h=0
+   div.container h=0
+div.container h=3731
+   div.row h=3731
