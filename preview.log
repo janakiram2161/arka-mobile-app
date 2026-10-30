@@ -1,0 +1,69 @@
+Compiling lib/main.dart for the Web...                          
+Wasm dry run succeeded. Consider building and testing your application with the `--wasm` flag. See docs for more info: https://docs.flutter.dev/platform-integration/web/wasm
+Use --no-wasm-dry-run to disable these warnings.
+Expected to find fonts for (MaterialIcons, packages/cupertino_icons/CupertinoIcons), but found (MaterialIcons). This usually means you are referring to font families in an IconData class but not including them in the assets section of your pubspec.yaml, are missing the package that would include them, or are missing "uses-material-design: true".
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 11620 bytes (99.3% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Compiling lib/main.dart for the Web...                             44.4s
+✓ Built build/web
+127.0.0.1 - - [30/Oct/2026 11:35:37] "GET /?screen=home HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:37] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:37] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:37] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:37] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:38] "GET /assets/AssetManifest.bin.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:38] "GET /assets/assets/images/arka_logo_dark.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:38] "GET /assets/assets/images/arka_logo_light.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:46] "GET /?screen=home HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:46] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:46] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:47] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:47] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:47] "GET /assets/AssetManifest.bin.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:47] "GET /assets/assets/images/arka_logo_dark.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:47] "GET /assets/assets/images/arka_logo_light.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:59] "GET /?screen=shop HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:59] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:59] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:59] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:59] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:35:59] "GET /assets/AssetManifest.bin.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:00] "GET /assets/assets/images/arka_logo_dark.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:00] "GET /assets/assets/images/arka_logo_light.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:08] "GET /?screen=product-3219 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:08] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:08] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:08] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:08] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:09] "GET /assets/AssetManifest.bin.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:09] "GET /assets/assets/images/arka_logo_dark.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:17] "GET /?screen=more HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:17] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:17] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:18] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:18] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:18] "GET /assets/AssetManifest.bin.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:18] "GET /assets/assets/images/arka_logo_dark.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:18] "GET /assets/assets/images/arka_logo_light.png HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:26] "GET /?screen=legal-1776 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:26] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:26] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:27] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:27] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:35] "GET /?screen=legal-1765 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:35] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:35] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:36] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:36] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:45] "GET /?screen=legal-1786 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:45] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:45] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:45] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [30/Oct/2026 11:36:45] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+shot 01_home
+shot 02_home_scrolled
+shot 03_shop
+shot 04_product
+shot 05_more
+shot 06_impressum
+shot 07_agb
+shot 08_versand
