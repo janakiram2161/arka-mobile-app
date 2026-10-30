@@ -65,7 +65,7 @@ class CartScreen extends StatelessWidget {
                         const Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'inkl. MwSt., zzgl. Versand. Gutscheine und Endbetrag an der Kasse.',
+                            'Kein Ausweis der USt. gem. § 19 UStG, zzgl. Versand. Gutscheine und Endbetrag an der Kasse.',
                             style: TextStyle(fontSize: 12, color: ArkaColors.muted),
                           ),
                         ),

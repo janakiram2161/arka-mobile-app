@@ -289,7 +289,7 @@ class _ProductBodyState extends State<_ProductBody> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    const Text('inkl. MwSt., zzgl. Versand', style: TextStyle(fontSize: 12, color: ArkaColors.muted)),
+                    const Text('Kein Ausweis der USt. gem. § 19 UStG, zzgl. Versand', style: TextStyle(fontSize: 12, color: ArkaColors.muted)),
                     const SizedBox(height: 8),
                     _StockLine(inStock: _inStock, text: _variationProduct?.stockText ?? p.stockText),
                     if (p.shortDescription.isNotEmpty) ...[
