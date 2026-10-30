@@ -1,0 +1,23 @@
+name: Diagnose shop
+on:
+  push:
+    branches: [diag]
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install playwright requests && python -m playwright install --with-deps chromium
+      - name: Run diagnostics
+        run: python diag/run.py 2>&1 | tee out.log
+        continue-on-error: true
+      - name: Push results
+        if: always()
+        run: |
+          mkdir -p out && cp out.log out/ || true
+          cd out && git init -q && git add . && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "diag ${{ github.run_number }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/diag-results
